@@ -44,6 +44,36 @@
   let currentMode = 'timer'; // 'timer' or 'stopwatch'
   let timer = null;
   let stopwatch = null;
+  let notificationPermission = false;
+
+  // ============================================
+  // Notifications
+  // ============================================
+  function requestNotificationPermission() {
+    if (!('Notification' in window)) return;
+
+    if (Notification.permission === 'granted') {
+      notificationPermission = true;
+    } else if (Notification.permission !== 'denied') {
+      Notification.requestPermission().then(permission => {
+        notificationPermission = permission === 'granted';
+      });
+    }
+  }
+
+  function showNotification(title, body) {
+    if (!notificationPermission) return;
+
+    try {
+      new Notification(title, {
+        body: body,
+        icon: '⏰',
+        tag: 'timer-complete'
+      });
+    } catch (e) {
+      console.warn('Notification failed:', e);
+    }
+  }
 
   // ============================================
   // Timer UI Functions
@@ -66,6 +96,13 @@
   }
 
   function onTimerComplete() {
+    // Play alarm sound
+    const settings = StorageManager.loadSettings();
+    AudioManager.play(settings.soundType, settings.volume);
+
+    // Show notification
+    showNotification('Timer Complete!', 'Your timer has finished.');
+
     // Completion pulse effect
     elements.timerDisplay.classList.add('animate-pulse-complete');
     document.body.classList.add('animate-flash');
@@ -80,7 +117,6 @@
       elements.btnPause.classList.add('hidden');
     }, 1500);
 
-    // TODO Phase 5: Play alarm, show notification
     console.log('Timer complete!');
   }
 
@@ -121,6 +157,9 @@
   function handleStart() {
     const duration = getInputDuration();
     if (duration <= 0) return;
+
+    // Save timer duration
+    StorageManager.saveTimerState({ duration: duration });
 
     // Create timer if not exists
     if (!timer) {
@@ -502,6 +541,21 @@
         input.value = Math.max(0, Math.min(max, val));
       });
     });
+
+    // Initialize audio on first user interaction
+    document.addEventListener('click', () => {
+      AudioManager.init();
+      AudioManager.resume();
+    }, { once: true });
+
+    // Request notification permission
+    requestNotificationPermission();
+
+    // Load saved timer duration
+    const savedTimer = StorageManager.loadTimerState();
+    if (savedTimer && savedTimer.lastDuration > 0) {
+      setInputDuration(savedTimer.lastDuration);
+    }
 
     console.log('Timer & Stopwatch initialized');
     console.log('Run TimerTests.runAll() or StopwatchTests.runAll() to verify');

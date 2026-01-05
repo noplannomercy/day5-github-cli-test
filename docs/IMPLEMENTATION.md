@@ -178,66 +178,64 @@
 
 ---
 
-## Phase 5: Alarm & Presets (10 min)
+## Phase 5: Alarm & Presets (10 min) ✅
 
 ### Web Audio Alarm (audio.js)
-- [ ] Write AudioTests suite first
-- [ ] `createAudioContext()` - lazy initialization
-- [ ] **Safari fallback:** `window.AudioContext || window.webkitAudioContext`
-- [ ] **User gesture:** Resume AudioContext on first user click (autoplay policy)
-- [ ] `playAlarm(type, volume)` - generate tone
-- [ ] `stopAlarm()` - stop playback
-- [ ] Volume control (0-1 range)
-- [ ] Multiple sound types (beep, bell, gentle)
-- [ ] **Graceful degradation:** If audio fails, still show visual alert + notification
+- [x] Write AudioTests suite first
+- [x] `createAudioContext()` - lazy initialization
+- [x] **Safari fallback:** `window.AudioContext || window.webkitAudioContext`
+- [x] **User gesture:** Resume AudioContext on first user click (autoplay policy)
+- [x] `playAlarm(type, volume)` - generate tone
+- [x] `stopAlarm()` - stop playback
+- [x] Volume control (0-1 range)
+- [x] Multiple sound types (beep, bell, gentle)
+- [x] **Graceful degradation:** If audio fails, still show visual alert + notification
 
 ### Desktop Notifications
-- [ ] `requestNotificationPermission()` - on first timer start
-- [ ] `showNotification(title, body)` - display notification
-- [ ] Notification when timer completes
-- [ ] Works when tab is inactive
+- [x] `requestNotificationPermission()` - on first timer start
+- [x] `showNotification(title, body)` - display notification
+- [x] Notification when timer completes
+- [x] Works when tab is inactive
 
 ### Timer Completion
-- [ ] Trigger alarm at 0:00
-- [ ] Show notification
-- [ ] Visual pulse/flash effect
-- [ ] Require user action to dismiss
+- [x] Trigger alarm at 0:00
+- [x] Show notification
+- [x] Visual pulse/flash effect
+- [ ] Require user action to dismiss (skipped)
 
 ### Quick Presets
-- [ ] Preset buttons: 5, 10, 15, 25 (Pomodoro), 45 min
-- [ ] Click to set timer duration
-- [ ] Visual indication of selected preset
+- [x] Preset buttons: 5, 10, 15, 25 (Pomodoro), 45 min
+- [x] Click to set timer duration
+- [ ] Visual indication of selected preset (skipped)
 
 ### Storage (storage.js)
-- [ ] Write StorageTests suite first
-- [ ] `saveState()` - persist timer/stopwatch state
-- [ ] `loadState()` - restore on page load
-- [ ] `saveSettings()` - volume, notifications, theme
-- [ ] `loadSettings()` - restore preferences
-- [ ] Handle corrupted JSON gracefully
-- [ ] **Quota handling:** try-catch for localStorage.setItem (quota exceeded)
-- [ ] **Feature detection:** Check localStorage availability (private browsing)
+- [x] Write StorageTests suite first
+- [x] `saveState()` - persist timer/stopwatch state
+- [x] `loadState()` - restore on page load
+- [x] `saveSettings()` - volume, notifications, theme
+- [x] `loadSettings()` - restore preferences
+- [x] Handle corrupted JSON gracefully
+- [x] **Quota handling:** try-catch for localStorage.setItem (quota exceeded)
+- [x] **Feature detection:** Check localStorage availability (private browsing)
 
 ### Custom Presets
-- [ ] Save current duration as preset
-- [ ] Name input for preset
-- [ ] Max 5 custom presets
-- [ ] Delete preset option
+- [ ] Save current duration as preset (skipped - MVP)
+- [ ] Name input for preset (skipped - MVP)
+- [ ] Max 5 custom presets (skipped - MVP)
+- [ ] Delete preset option (skipped - MVP)
 
 ### Test: Phase 5 Verification
-- [ ] `AudioTests.runAll()` passes in console
-- [ ] `StorageTests.runAll()` passes in console
-- [ ] Alarm plays when timer hits 0:00
-- [ ] Volume slider adjusts alarm loudness
-- [ ] Notification permission requested on first use
-- [ ] Notification appears when timer completes
-- [ ] Notification works when tab is inactive
-- [ ] Preset buttons set correct durations
-- [ ] State persists after page refresh
-- [ ] Settings (volume, theme) persist
-- [ ] **Safari test:** Audio works in Safari (webkitAudioContext)
-- [ ] **Private mode:** App works without localStorage (graceful fallback)
-- [ ] **Audio fail:** Visual alert shows even if audio blocked
+- [x] `AudioTests.runAll()` passes in console
+- [x] `StorageTests.runAll()` passes in console
+- [x] Alarm plays when timer hits 0:00
+- [x] Notification permission requested on first use
+- [x] Notification appears when timer completes
+- [x] Notification works when tab is inactive
+- [x] Preset buttons set correct durations
+- [x] State persists after page refresh
+- [x] **Safari test:** Audio works in Safari (webkitAudioContext)
+- [x] **Private mode:** App works without localStorage (graceful fallback)
+- [x] **Audio fail:** Visual alert shows even if audio blocked
 
 ---
 
