@@ -43,6 +43,7 @@
   // ============================================
   let currentMode = 'timer'; // 'timer' or 'stopwatch'
   let timer = null;
+  let stopwatch = null;
 
   // ============================================
   // Timer UI Functions
@@ -168,6 +169,117 @@
   }
 
   // ============================================
+  // Stopwatch UI Functions
+  // ============================================
+  function updateStopwatchDisplay(elapsed) {
+    const time = formatTimeMs(elapsed);
+    elements.stopwatchDisplay.innerHTML = `${time.main}<span class="text-4xl text-gray-400">.${time.ms}</span>`;
+  }
+
+  function renderLaps(laps) {
+    if (laps.length === 0) {
+      elements.lapContainer.classList.add('hidden');
+      return;
+    }
+
+    elements.lapContainer.classList.remove('hidden');
+
+    // Render in reverse order (newest first)
+    const html = [...laps].reverse().map(lap => {
+      const split = formatTimeMs(lap.split);
+      const total = formatTimeMs(lap.total);
+      return `
+        <div class="flex justify-between items-center p-2 bg-gray-800 rounded">
+          <span class="text-gray-400">Lap ${lap.number}</span>
+          <span class="font-mono">${split.main}.${split.ms}</span>
+          <span class="text-gray-500 text-sm">${total.main}.${total.ms}</span>
+        </div>
+      `;
+    }).join('');
+
+    elements.lapList.innerHTML = html;
+  }
+
+  // ============================================
+  // Stopwatch Event Handlers
+  // ============================================
+  function handleSwStart() {
+    // Create stopwatch if not exists
+    if (!stopwatch) {
+      stopwatch = createStopwatch(updateStopwatchDisplay);
+    }
+
+    stopwatch.start();
+
+    // Update buttons
+    elements.btnSwStart.classList.add('hidden');
+    elements.btnSwPause.classList.remove('hidden');
+    elements.btnSwLap.classList.remove('hidden');
+  }
+
+  function handleSwPause() {
+    if (!stopwatch) return;
+
+    if (stopwatch.isPaused()) {
+      // Resume
+      stopwatch.resume();
+      elements.btnSwPause.textContent = 'Pause';
+      elements.btnSwPause.className = 'px-8 py-4 rounded-lg bg-yellow-600 text-white font-bold text-lg min-h-[44px] min-w-[100px] transition-all hover:bg-yellow-500 active:scale-95';
+    } else {
+      // Pause
+      stopwatch.pause();
+      elements.btnSwPause.textContent = 'Resume';
+      elements.btnSwPause.className = 'px-8 py-4 rounded-lg bg-green-600 text-white font-bold text-lg min-h-[44px] min-w-[100px] transition-all hover:bg-green-500 active:scale-95';
+    }
+  }
+
+  function handleSwLap() {
+    if (!stopwatch) return;
+
+    stopwatch.lap();
+    renderLaps(stopwatch.getLaps());
+  }
+
+  function handleSwReset() {
+    if (stopwatch) {
+      stopwatch.reset();
+    }
+
+    // Reset UI
+    updateStopwatchDisplay(0);
+    elements.btnSwStart.classList.remove('hidden');
+    elements.btnSwPause.classList.add('hidden');
+    elements.btnSwPause.textContent = 'Pause';
+    elements.btnSwPause.className = 'px-8 py-4 rounded-lg bg-yellow-600 text-white font-bold text-lg min-h-[44px] min-w-[100px] transition-all hover:bg-yellow-500 active:scale-95 hidden';
+    elements.btnSwLap.classList.add('hidden');
+    elements.lapContainer.classList.add('hidden');
+    elements.lapList.innerHTML = '';
+  }
+
+  function handleSwExport() {
+    if (!stopwatch) return;
+
+    const laps = stopwatch.getLaps();
+    if (laps.length === 0) return;
+
+    const csv = exportLapsToCSV(laps);
+
+    // Copy to clipboard
+    navigator.clipboard.writeText(csv).then(() => {
+      console.log('Laps copied to clipboard!');
+      // Brief visual feedback
+      const btn = document.getElementById('btn-sw-export');
+      if (btn) {
+        const originalText = btn.textContent;
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = originalText, 1500);
+      }
+    }).catch(err => {
+      console.error('Failed to copy:', err);
+    });
+  }
+
+  // ============================================
   // Tab Switching
   // ============================================
   function switchToTimer() {
@@ -199,6 +311,18 @@
     elements.btnPause.addEventListener('click', handlePause);
     elements.btnReset.addEventListener('click', handleReset);
 
+    // Stopwatch control events
+    elements.btnSwStart.addEventListener('click', handleSwStart);
+    elements.btnSwPause.addEventListener('click', handleSwPause);
+    elements.btnSwLap.addEventListener('click', handleSwLap);
+    elements.btnSwReset.addEventListener('click', handleSwReset);
+
+    // Export button (if exists)
+    const btnExport = document.getElementById('btn-sw-export');
+    if (btnExport) {
+      btnExport.addEventListener('click', handleSwExport);
+    }
+
     // Preset events
     document.querySelectorAll('.preset-btn').forEach(btn => {
       btn.addEventListener('click', handlePreset);
@@ -214,7 +338,7 @@
     });
 
     console.log('Timer & Stopwatch initialized');
-    console.log('Run TimerTests.runAll() to verify timer logic');
+    console.log('Run TimerTests.runAll() or StopwatchTests.runAll() to verify');
   }
 
   // Start app
