@@ -66,10 +66,19 @@
   }
 
   function onTimerComplete() {
-    // Reset UI to input state
-    showTimerInput();
-    elements.btnStart.classList.remove('hidden');
-    elements.btnPause.classList.add('hidden');
+    // Completion pulse effect
+    elements.timerDisplay.classList.add('animate-pulse-complete');
+    document.body.classList.add('animate-flash');
+
+    setTimeout(() => {
+      elements.timerDisplay.classList.remove('animate-pulse-complete');
+      document.body.classList.remove('animate-flash');
+
+      // Reset UI to input state
+      showTimerInput();
+      elements.btnStart.classList.remove('hidden');
+      elements.btnPause.classList.add('hidden');
+    }, 1500);
 
     // TODO Phase 5: Play alarm, show notification
     console.log('Timer complete!');
@@ -280,6 +289,32 @@
   }
 
   // ============================================
+  // Fullscreen Mode
+  // ============================================
+  function toggleFullscreen() {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(err => {
+        console.log('Fullscreen error:', err);
+      });
+    } else {
+      document.exitFullscreen();
+    }
+  }
+
+  function updateFullscreenIcon() {
+    const iconExpand = document.getElementById('icon-expand');
+    const iconCompress = document.getElementById('icon-compress');
+
+    if (document.fullscreenElement) {
+      iconExpand.classList.add('hidden');
+      iconCompress.classList.remove('hidden');
+    } else {
+      iconExpand.classList.remove('hidden');
+      iconCompress.classList.add('hidden');
+    }
+  }
+
+  // ============================================
   // Tab Switching
   // ============================================
   function switchToTimer() {
@@ -322,6 +357,15 @@
     if (btnExport) {
       btnExport.addEventListener('click', handleSwExport);
     }
+
+    // Fullscreen button
+    const btnFullscreen = document.getElementById('btn-fullscreen');
+    if (btnFullscreen) {
+      btnFullscreen.addEventListener('click', toggleFullscreen);
+    }
+
+    // Fullscreen change event
+    document.addEventListener('fullscreenchange', updateFullscreenIcon);
 
     // Preset events
     document.querySelectorAll('.preset-btn').forEach(btn => {

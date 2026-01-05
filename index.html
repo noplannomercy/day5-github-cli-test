@@ -7,12 +7,39 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     .font-mono-nums { font-variant-numeric: tabular-nums; }
+
+    /* Completion pulse animation */
+    @keyframes pulse-complete {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.05); opacity: 0.8; }
+    }
+    .animate-pulse-complete {
+      animation: pulse-complete 0.5s ease-in-out 3;
+    }
+
+    /* Flash effect */
+    @keyframes flash {
+      0%, 50%, 100% { background-color: rgb(17, 24, 39); }
+      25%, 75% { background-color: rgb(239, 68, 68); }
+    }
+    .animate-flash {
+      animation: flash 0.5s ease-in-out 2;
+    }
   </style>
 </head>
 <body class="bg-gray-900 text-white min-h-screen flex flex-col">
   <!-- Header -->
-  <header class="p-4 text-center">
+  <header class="p-4 flex justify-between items-center">
+    <div class="w-10"></div>
     <h1 class="text-2xl font-bold">Timer & Stopwatch</h1>
+    <button id="btn-fullscreen" class="w-10 h-10 rounded-lg bg-gray-800 hover:bg-gray-700 flex items-center justify-center transition-all" title="Fullscreen (F)">
+      <svg id="icon-expand" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/>
+      </svg>
+      <svg id="icon-compress" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 9V4H4m0 0l5 5m6-5h5v5m0 0l-5-5M9 15v5H4m0 0l5-5m6 5h5v-5m0 0l-5 5"/>
+      </svg>
+    </button>
   </header>
 
   <!-- Mode Tabs -->

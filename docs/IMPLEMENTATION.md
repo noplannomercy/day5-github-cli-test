@@ -7,86 +7,86 @@
 
 ---
 
-## Phase 1: Basic Timer (12 min)
+## Phase 1: Basic Timer (12 min) ✅
 
 ### Setup
-- [ ] Create index.html with Tailwind CDN
-- [ ] Create js/ folder structure
-- [ ] Create empty module files (app.js, timer.js, stopwatch.js, audio.js, storage.js)
+- [x] Create index.html with Tailwind CDN
+- [x] Create js/ folder structure
+- [x] Create empty module files (app.js, timer.js, stopwatch.js, audio.js, storage.js)
 
 ### HTML Structure
-- [ ] Header with app title
-- [ ] Mode tabs (Timer / Stopwatch)
-- [ ] Time input fields (HH:MM:SS)
-- [ ] Large time display area
-- [ ] Control buttons (Start, Pause, Reset)
-- [ ] Quick preset buttons area
+- [x] Header with app title
+- [x] Mode tabs (Timer / Stopwatch)
+- [x] Time input fields (HH:MM:SS)
+- [x] Large time display area
+- [x] Control buttons (Start, Pause, Reset)
+- [x] Quick preset buttons area
 
 ### Timer Logic (timer.js)
-- [ ] Write TimerTests suite first
-- [ ] `createTimer()` - factory function with state
-- [ ] `start()` - record targetTime using Date.now()
-- [ ] `pause()` - store remaining time, cancel rAF
-- [ ] `resume()` - recalculate targetTime from remaining
-- [ ] `reset()` - clear state, cancel rAF
-- [ ] `tick()` - rAF loop calculating remaining from timestamps
-- [ ] `formatTime(ms)` - convert to MM:SS display
-- [ ] **Performance:** Only update DOM when seconds change (not every frame)
-- [ ] **Visibility:** Handle `visibilitychange` event to restart rAF on tab focus
-- [ ] **Guard:** Stop at 0, prevent negative countdown
+- [x] Write TimerTests suite first
+- [x] `createTimer()` - factory function with state
+- [x] `start()` - record targetTime using Date.now()
+- [x] `pause()` - store remaining time, cancel rAF
+- [x] `resume()` - recalculate targetTime from remaining
+- [x] `reset()` - clear state, cancel rAF
+- [x] `tick()` - rAF loop calculating remaining from timestamps
+- [x] `formatTime(ms)` - convert to MM:SS display
+- [x] **Performance:** Only update DOM when seconds change (not every frame)
+- [x] **Visibility:** Handle `visibilitychange` event to restart rAF on tab focus
+- [x] **Guard:** Stop at 0, prevent negative countdown
 
 ### App Integration (app.js)
-- [ ] DOM element references
-- [ ] Button event listeners
-- [ ] `updateDisplay()` - render time to DOM
-- [ ] Connect timer callbacks to UI
+- [x] DOM element references
+- [x] Button event listeners
+- [x] `updateDisplay()` - render time to DOM
+- [x] Connect timer callbacks to UI
 
 ### Test: Phase 1 Verification
-- [ ] `TimerTests.runAll()` passes in console
-- [ ] Start button begins countdown
-- [ ] Pause stops countdown, preserves time
-- [ ] Reset clears to initial time
-- [ ] Display updates smoothly (no flicker)
-- [ ] 60-second timer = exactly 60 seconds (use phone stopwatch)
-- [ ] **Tab switch test:** Switch tab mid-countdown, return - time still accurate
-- [ ] **Zero guard:** Timer stops exactly at 0:00, no negative values
-- [ ] **Sleep test:** Close laptop lid, reopen - timer shows correct remaining time
+- [x] `TimerTests.runAll()` passes in console
+- [x] Start button begins countdown
+- [x] Pause stops countdown, preserves time
+- [x] Reset clears to initial time
+- [x] Display updates smoothly (no flicker)
+- [x] 60-second timer = exactly 60 seconds (use phone stopwatch)
+- [x] **Tab switch test:** Switch tab mid-countdown, return - time still accurate
+- [x] **Zero guard:** Timer stops exactly at 0:00, no negative values
+- [x] **Sleep test:** Close laptop lid, reopen - timer shows correct remaining time
 
 ---
 
-## Phase 2: Stopwatch (10 min)
+## Phase 2: Stopwatch (10 min) ✅
 
 ### Stopwatch Logic (stopwatch.js)
-- [ ] Write StopwatchTests suite first
-- [ ] `createStopwatch()` - factory function with state
-- [ ] `start()` - record startTime using performance.now()
-- [ ] `pause()` - accumulate elapsed, cancel rAF
-- [ ] `resume()` - new startTime, keep accumulated
-- [ ] `reset()` - clear elapsed and laps
-- [ ] `lap()` - record split time to laps array
-- [ ] `tick()` - rAF loop with millisecond precision
-- [ ] `formatTimeMs(ms)` - convert to HH:MM:SS.ms
+- [x] Write StopwatchTests suite first
+- [x] `createStopwatch()` - factory function with state
+- [x] `start()` - record startTime using performance.now()
+- [x] `pause()` - accumulate elapsed, cancel rAF
+- [x] `resume()` - new startTime, keep accumulated
+- [x] `reset()` - clear elapsed and laps
+- [x] `lap()` - record split time to laps array
+- [x] `tick()` - rAF loop with millisecond precision
+- [x] `formatTimeMs(ms)` - convert to HH:MM:SS.ms
 
 ### HTML Updates
-- [ ] Stopwatch display area (shows ms)
-- [ ] Lap button
-- [ ] Lap times list (scrollable)
-- [ ] Export laps button
+- [x] Stopwatch display area (shows ms)
+- [x] Lap button
+- [x] Lap times list (scrollable)
+- [x] Export laps button
 
 ### App Integration
-- [ ] Tab switching logic (preserve states)
-- [ ] Stopwatch button handlers
-- [ ] `renderLaps()` - display lap list
-- [ ] Mode state management
+- [x] Tab switching logic (preserve states)
+- [x] Stopwatch button handlers
+- [x] `renderLaps()` - display lap list
+- [x] Mode state management
 
 ### Test: Phase 2 Verification
-- [ ] `StopwatchTests.runAll()` passes in console
-- [ ] Stopwatch counts up with milliseconds visible
-- [ ] Lap button records split time
-- [ ] Laps display in reverse order (newest first)
-- [ ] Pause/Resume maintains accurate time
-- [ ] Tab switch preserves both timer and stopwatch state
-- [ ] Millisecond precision verified (compare to phone)
+- [x] `StopwatchTests.runAll()` passes in console
+- [x] Stopwatch counts up with milliseconds visible
+- [x] Lap button records split time
+- [x] Laps display in reverse order (newest first)
+- [x] Pause/Resume maintains accurate time
+- [x] Tab switch preserves both timer and stopwatch state
+- [x] Millisecond precision verified (compare to phone)
 
 ---
 
