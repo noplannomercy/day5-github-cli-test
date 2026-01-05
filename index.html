@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Timer & Stopwatch</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .font-mono-nums { font-variant-numeric: tabular-nums; }
+  </style>
+</head>
+<body class="bg-gray-900 text-white min-h-screen flex flex-col">
+  <!-- Header -->
+  <header class="p-4 text-center">
+    <h1 class="text-2xl font-bold">Timer & Stopwatch</h1>
+  </header>
+
+  <!-- Mode Tabs -->
+  <nav class="flex justify-center gap-2 p-4">
+    <button id="tab-timer" class="px-6 py-3 rounded-lg bg-blue-600 text-white font-semibold min-h-[44px] transition-all hover:bg-blue-500">
+      Timer
+    </button>
+    <button id="tab-stopwatch" class="px-6 py-3 rounded-lg bg-gray-700 text-gray-300 font-semibold min-h-[44px] transition-all hover:bg-gray-600">
+      Stopwatch
+    </button>
+  </nav>
+
+  <main class="flex-1 flex flex-col items-center justify-center p-4">
+    <!-- Timer Mode -->
+    <section id="timer-mode" class="w-full max-w-md flex flex-col items-center gap-6">
+      <!-- Time Input -->
+      <div id="timer-input" class="flex items-center gap-2 text-4xl font-mono-nums">
+        <input type="number" id="input-hours" min="0" max="99" value="0"
+          class="w-20 bg-gray-800 text-center rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <span>:</span>
+        <input type="number" id="input-minutes" min="0" max="59" value="25"
+          class="w-20 bg-gray-800 text-center rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <span>:</span>
+        <input type="number" id="input-seconds" min="0" max="59" value="0"
+          class="w-20 bg-gray-800 text-center rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+      </div>
+
+      <!-- Large Display -->
+      <div id="timer-display" class="text-8xl font-bold font-mono-nums tracking-wider hidden">
+        25:00
+      </div>
+
+      <!-- Progress Bar -->
+      <div id="progress-container" class="w-full h-2 bg-gray-700 rounded-full overflow-hidden hidden">
+        <div id="progress-bar" class="h-full bg-green-500 transition-all duration-200" style="width: 100%"></div>
+      </div>
+
+      <!-- Controls -->
+      <div class="flex gap-4">
+        <button id="btn-start" class="px-8 py-4 rounded-lg bg-green-600 text-white font-bold text-lg min-h-[44px] min-w-[100px] transition-all hover:bg-green-500 active:scale-95">
+          Start
+        </button>
+        <button id="btn-pause" class="px-8 py-4 rounded-lg bg-yellow-600 text-white font-bold text-lg min-h-[44px] min-w-[100px] transition-all hover:bg-yellow-500 active:scale-95 hidden">
+          Pause
+        </button>
+        <button id="btn-reset" class="px-8 py-4 rounded-lg bg-gray-600 text-white font-bold text-lg min-h-[44px] min-w-[100px] transition-all hover:bg-gray-500 active:scale-95">
+          Reset
+        </button>
+      </div>
+
+      <!-- Quick Presets -->
+      <div class="flex flex-wrap justify-center gap-2 mt-4">
+        <button data-preset="300" class="preset-btn px-4 py-2 rounded-lg bg-gray-700 hover:bg-gray-600 min-h-[44px] transition-all active:scale-95">5 min</button>
+        <button data-preset="600" class="preset-btn px-4 py-2 rounded-lg bg-gray-700 hover:bg-gray-600 min-h-[44px] transition-all active:scale-95">10 min</button>
+        <button data-preset="900" class="preset-btn px-4 py-2 rounded-lg bg-gray-700 hover:bg-gray-600 min-h-[44px] transition-all active:scale-95">15 min</button>
+        <button data-preset="1500" class="preset-btn px-4 py-2 rounded-lg bg-blue-700 hover:bg-blue-600 min-h-[44px] transition-all active:scale-95">25 min</button>
+        <button data-preset="2700" class="preset-btn px-4 py-2 rounded-lg bg-gray-700 hover:bg-gray-600 min-h-[44px] transition-all active:scale-95">45 min</button>
+      </div>
+    </section>
+
+    <!-- Stopwatch Mode (hidden by default) -->
+    <section id="stopwatch-mode" class="w-full max-w-md flex flex-col items-center gap-6 hidden">
+      <!-- Large Display with milliseconds -->
+      <div id="stopwatch-display" class="text-7xl font-bold font-mono-nums tracking-wider">
+        00:00:00<span class="text-4xl text-gray-400">.00</span>
+      </div>
+
+      <!-- Controls -->
+      <div class="flex gap-4">
+        <button id="btn-sw-start" class="px-8 py-4 rounded-lg bg-green-600 text-white font-bold text-lg min-h-[44px] min-w-[100px] transition-all hover:bg-green-500 active:scale-95">
+          Start
+        </button>
+        <button id="btn-sw-pause" class="px-8 py-4 rounded-lg bg-yellow-600 text-white font-bold text-lg min-h-[44px] min-w-[100px] transition-all hover:bg-yellow-500 active:scale-95 hidden">
+          Pause
+        </button>
+        <button id="btn-sw-lap" class="px-8 py-4 rounded-lg bg-blue-600 text-white font-bold text-lg min-h-[44px] min-w-[100px] transition-all hover:bg-blue-500 active:scale-95 hidden">
+          Lap
+        </button>
+        <button id="btn-sw-reset" class="px-8 py-4 rounded-lg bg-gray-600 text-white font-bold text-lg min-h-[44px] min-w-[100px] transition-all hover:bg-gray-500 active:scale-95">
+          Reset
+        </button>
+      </div>
+
+      <!-- Lap Times -->
+      <div id="lap-container" class="w-full max-h-48 overflow-y-auto hidden">
+        <div id="lap-list" class="space-y-2"></div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Scripts -->
+  <script src="js/timer.js"></script>
+  <script src="js/stopwatch.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
