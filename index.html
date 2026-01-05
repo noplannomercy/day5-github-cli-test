@@ -136,6 +136,45 @@
     </section>
   </main>
 
+  <!-- Help Panel -->
+  <div id="help-panel" class="fixed inset-0 bg-black/70 flex items-center justify-center hidden z-50">
+    <div class="bg-gray-800 rounded-xl p-6 max-w-md w-full mx-4 shadow-2xl">
+      <h2 class="text-xl font-bold mb-4 text-center">Keyboard Shortcuts</h2>
+
+      <div class="space-y-4 text-sm">
+        <div>
+          <h3 class="font-semibold text-blue-400 mb-2">Global</h3>
+          <div class="grid grid-cols-2 gap-1 text-gray-300">
+            <span><kbd class="bg-gray-700 px-2 py-1 rounded">Space</kbd> Start/Pause</span>
+            <span><kbd class="bg-gray-700 px-2 py-1 rounded">R</kbd> Reset</span>
+            <span><kbd class="bg-gray-700 px-2 py-1 rounded">Esc</kbd> Stop & Reset</span>
+            <span><kbd class="bg-gray-700 px-2 py-1 rounded">F</kbd> Fullscreen</span>
+            <span><kbd class="bg-gray-700 px-2 py-1 rounded">M</kbd> Switch Mode</span>
+            <span><kbd class="bg-gray-700 px-2 py-1 rounded">?</kbd> Help</span>
+          </div>
+        </div>
+
+        <div>
+          <h3 class="font-semibold text-green-400 mb-2">Timer</h3>
+          <div class="grid grid-cols-2 gap-1 text-gray-300">
+            <span><kbd class="bg-gray-700 px-2 py-1 rounded">1-5</kbd> Presets</span>
+            <span><kbd class="bg-gray-700 px-2 py-1 rounded">+/-</kbd> ±1 minute</span>
+          </div>
+        </div>
+
+        <div>
+          <h3 class="font-semibold text-yellow-400 mb-2">Stopwatch</h3>
+          <div class="grid grid-cols-2 gap-1 text-gray-300">
+            <span><kbd class="bg-gray-700 px-2 py-1 rounded">L</kbd> Lap</span>
+            <span><kbd class="bg-gray-700 px-2 py-1 rounded">E</kbd> Export</span>
+          </div>
+        </div>
+      </div>
+
+      <p class="text-gray-500 text-xs text-center mt-4">Press <kbd class="bg-gray-700 px-1 rounded">?</kbd> or click outside to close</p>
+    </div>
+  </div>
+
   <!-- Scripts -->
   <script src="js/timer.js"></script>
   <script src="js/stopwatch.js"></script>

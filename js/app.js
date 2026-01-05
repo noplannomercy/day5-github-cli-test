@@ -289,6 +289,115 @@
   }
 
   // ============================================
+  // Keyboard Shortcuts
+  // ============================================
+  function handleKeydown(e) {
+    // Skip if typing in input field
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+      return;
+    }
+
+    const key = e.key.toLowerCase();
+
+    // Global shortcuts
+    switch (key) {
+      case ' ': // Space - Start/Pause
+        e.preventDefault();
+        if (currentMode === 'timer') {
+          if (timer && (timer.isRunning() || timer.isPaused())) {
+            handlePause();
+          } else {
+            handleStart();
+          }
+        } else {
+          if (stopwatch && (stopwatch.isRunning() || stopwatch.isPaused())) {
+            handleSwPause();
+          } else {
+            handleSwStart();
+          }
+        }
+        break;
+
+      case 'r': // Reset
+        if (currentMode === 'timer') {
+          handleReset();
+        } else {
+          handleSwReset();
+        }
+        break;
+
+      case 'escape': // Stop and Reset
+        if (currentMode === 'timer') {
+          handleReset();
+        } else {
+          handleSwReset();
+        }
+        break;
+
+      case 'f': // Fullscreen
+        toggleFullscreen();
+        break;
+
+      case 'm': // Mode switch
+        if (currentMode === 'timer') {
+          switchToStopwatch();
+        } else {
+          switchToTimer();
+        }
+        break;
+
+      case '?': // Help panel
+        toggleHelpPanel();
+        break;
+    }
+
+    // Timer-specific shortcuts
+    if (currentMode === 'timer') {
+      switch (key) {
+        case '1': setInputDuration(5 * 60 * 1000); break;
+        case '2': setInputDuration(10 * 60 * 1000); break;
+        case '3': setInputDuration(15 * 60 * 1000); break;
+        case '4': setInputDuration(25 * 60 * 1000); break;
+        case '5': setInputDuration(45 * 60 * 1000); break;
+        case '+':
+        case '=':
+          adjustTimerMinutes(1);
+          break;
+        case '-':
+          adjustTimerMinutes(-1);
+          break;
+      }
+    }
+
+    // Stopwatch-specific shortcuts
+    if (currentMode === 'stopwatch') {
+      switch (key) {
+        case 'l': // Lap
+          if (stopwatch && stopwatch.isRunning()) {
+            handleSwLap();
+          }
+          break;
+        case 'e': // Export
+          handleSwExport();
+          break;
+      }
+    }
+  }
+
+  function adjustTimerMinutes(delta) {
+    const current = getInputDuration();
+    const newDuration = Math.max(0, current + delta * 60 * 1000);
+    setInputDuration(newDuration);
+  }
+
+  function toggleHelpPanel() {
+    const panel = document.getElementById('help-panel');
+    if (panel) {
+      panel.classList.toggle('hidden');
+    }
+  }
+
+  // ============================================
   // Fullscreen Mode
   // ============================================
   function toggleFullscreen() {
@@ -366,6 +475,19 @@
 
     // Fullscreen change event
     document.addEventListener('fullscreenchange', updateFullscreenIcon);
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', handleKeydown);
+
+    // Help panel close on click outside
+    const helpPanel = document.getElementById('help-panel');
+    if (helpPanel) {
+      helpPanel.addEventListener('click', (e) => {
+        if (e.target === helpPanel) {
+          helpPanel.classList.add('hidden');
+        }
+      });
+    }
 
     // Preset events
     document.querySelectorAll('.preset-btn').forEach(btn => {
