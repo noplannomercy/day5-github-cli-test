@@ -18,6 +18,8 @@
     timerMode: document.getElementById('timer-mode'),
     timerInput: document.getElementById('timer-input'),
     timerDisplay: document.getElementById('timer-display'),
+    timerDisplayContainer: document.getElementById('timer-display-container'),
+    progressRing: document.getElementById('progress-ring'),
     inputHours: document.getElementById('input-hours'),
     inputMinutes: document.getElementById('input-minutes'),
     inputSeconds: document.getElementById('input-seconds'),
@@ -81,17 +83,26 @@
   function updateTimerDisplay(remaining, initial) {
     elements.timerDisplay.textContent = formatTime(remaining);
 
-    // Update progress bar
+    // Calculate progress percentage
     const progress = initial > 0 ? (remaining / initial) * 100 : 100;
+
+    // Update circular progress ring (SVG)
+    if (elements.progressRing) {
+      const circumference = 282.7; // 2πr where r=45
+      const offset = circumference * (1 - progress / 100);
+      elements.progressRing.style.strokeDashoffset = offset;
+    }
+
+    // Update horizontal progress bar (kept for fallback)
     elements.progressBar.style.width = `${progress}%`;
 
-    // Color change based on progress
+    // Color change based on progress (horizontal bar only)
     if (progress > 50) {
-      elements.progressBar.className = 'h-full bg-green-500 transition-all duration-200';
+      elements.progressBar.className = 'h-full bg-app-primary transition-all duration-1000 shadow-app-primary';
     } else if (progress > 25) {
-      elements.progressBar.className = 'h-full bg-yellow-500 transition-all duration-200';
+      elements.progressBar.className = 'h-full bg-yellow-500 transition-all duration-1000';
     } else {
-      elements.progressBar.className = 'h-full bg-red-500 transition-all duration-200';
+      elements.progressBar.className = 'h-full bg-red-500 transition-all duration-1000';
     }
   }
 
@@ -104,11 +115,12 @@
     showNotification('Timer Complete!', 'Your timer has finished.');
 
     // Completion pulse effect
-    elements.timerDisplay.classList.add('animate-pulse-complete');
+    const displayElement = elements.timerDisplayContainer || elements.timerDisplay;
+    displayElement.classList.add('animate-pulse-complete');
     document.body.classList.add('animate-flash');
 
     setTimeout(() => {
-      elements.timerDisplay.classList.remove('animate-pulse-complete');
+      displayElement.classList.remove('animate-pulse-complete');
       document.body.classList.remove('animate-flash');
 
       // Reset UI to input state
@@ -122,13 +134,17 @@
 
   function showTimerInput() {
     elements.timerInput.classList.remove('hidden');
-    elements.timerDisplay.classList.add('hidden');
+    if (elements.timerDisplayContainer) {
+      elements.timerDisplayContainer.classList.add('hidden');
+    }
     elements.progressContainer.classList.add('hidden');
   }
 
   function showTimerDisplay() {
     elements.timerInput.classList.add('hidden');
-    elements.timerDisplay.classList.remove('hidden');
+    if (elements.timerDisplayContainer) {
+      elements.timerDisplayContainer.classList.remove('hidden');
+    }
     elements.progressContainer.classList.remove('hidden');
   }
 
@@ -184,13 +200,13 @@
     if (timer.isPaused()) {
       // Resume
       timer.resume();
-      elements.btnPause.textContent = 'Pause';
-      elements.btnPause.className = 'px-8 py-4 rounded-lg bg-yellow-600 text-white font-bold text-lg min-h-[44px] min-w-[100px] transition-all hover:bg-yellow-500 active:scale-95';
+      elements.btnPause.textContent = 'PAUSE';
+      elements.btnPause.className = 'h-16 px-12 rounded-full bg-yellow-600 text-white font-black text-lg font-display tracking-wide transition-all hover:bg-yellow-500 active:scale-95 shadow-xl';
     } else {
       // Pause
       timer.pause();
-      elements.btnPause.textContent = 'Resume';
-      elements.btnPause.className = 'px-8 py-4 rounded-lg bg-green-600 text-white font-bold text-lg min-h-[44px] min-w-[100px] transition-all hover:bg-green-500 active:scale-95';
+      elements.btnPause.textContent = 'RESUME';
+      elements.btnPause.className = 'h-16 px-12 rounded-full bg-app-primary text-background-dark font-black text-lg font-display tracking-wide transition-all hover:brightness-110 active:scale-95 shadow-xl shadow-app-primary';
     }
   }
 
@@ -203,10 +219,15 @@
     showTimerInput();
     elements.btnStart.classList.remove('hidden');
     elements.btnPause.classList.add('hidden');
-    elements.btnPause.textContent = 'Pause';
-    elements.btnPause.className = 'px-8 py-4 rounded-lg bg-yellow-600 text-white font-bold text-lg min-h-[44px] min-w-[100px] transition-all hover:bg-yellow-500 active:scale-95 hidden';
+    elements.btnPause.textContent = 'PAUSE';
+    elements.btnPause.className = 'h-16 px-12 rounded-full bg-yellow-600 text-white font-black text-lg font-display tracking-wide transition-all hover:bg-yellow-500 active:scale-95 shadow-xl hidden';
     elements.progressBar.style.width = '100%';
-    elements.progressBar.className = 'h-full bg-green-500 transition-all duration-200';
+    elements.progressBar.className = 'h-full bg-app-primary transition-all duration-1000 shadow-app-primary';
+
+    // Reset progress ring
+    if (elements.progressRing) {
+      elements.progressRing.style.strokeDashoffset = '0';
+    }
   }
 
   function handlePreset(e) {
@@ -221,7 +242,7 @@
   // ============================================
   function updateStopwatchDisplay(elapsed) {
     const time = formatTimeMs(elapsed);
-    elements.stopwatchDisplay.innerHTML = `${time.main}<span class="text-4xl text-gray-400">.${time.ms}</span>`;
+    elements.stopwatchDisplay.innerHTML = `${time.main}<span class="text-4xl text-slate-400">.${time.ms}</span>`;
   }
 
   function renderLaps(laps) {
@@ -237,10 +258,10 @@
       const split = formatTimeMs(lap.split);
       const total = formatTimeMs(lap.total);
       return `
-        <div class="flex justify-between items-center p-2 bg-gray-800 rounded">
-          <span class="text-gray-400">Lap ${lap.number}</span>
-          <span class="font-mono">${split.main}.${split.ms}</span>
-          <span class="text-gray-500 text-sm">${total.main}.${total.ms}</span>
+        <div class="flex justify-between items-center p-3 bg-white/5 border border-white/10 rounded-xl">
+          <span class="text-slate-400 text-sm">Lap ${lap.number}</span>
+          <span class="font-mono text-white">${split.main}.${split.ms}</span>
+          <span class="text-slate-500 text-sm">${total.main}.${total.ms}</span>
         </div>
       `;
     }).join('');
@@ -271,13 +292,13 @@
     if (stopwatch.isPaused()) {
       // Resume
       stopwatch.resume();
-      elements.btnSwPause.textContent = 'Pause';
-      elements.btnSwPause.className = 'px-8 py-4 rounded-lg bg-yellow-600 text-white font-bold text-lg min-h-[44px] min-w-[100px] transition-all hover:bg-yellow-500 active:scale-95';
+      elements.btnSwPause.textContent = 'PAUSE';
+      elements.btnSwPause.className = 'h-16 px-12 rounded-full bg-yellow-600 text-white font-black text-lg font-display tracking-wide transition-all hover:bg-yellow-500 active:scale-95 shadow-xl';
     } else {
       // Pause
       stopwatch.pause();
-      elements.btnSwPause.textContent = 'Resume';
-      elements.btnSwPause.className = 'px-8 py-4 rounded-lg bg-green-600 text-white font-bold text-lg min-h-[44px] min-w-[100px] transition-all hover:bg-green-500 active:scale-95';
+      elements.btnSwPause.textContent = 'RESUME';
+      elements.btnSwPause.className = 'h-16 px-12 rounded-full bg-app-primary text-background-dark font-black text-lg font-display tracking-wide transition-all hover:brightness-110 active:scale-95 shadow-xl shadow-app-primary';
     }
   }
 
@@ -297,8 +318,8 @@
     updateStopwatchDisplay(0);
     elements.btnSwStart.classList.remove('hidden');
     elements.btnSwPause.classList.add('hidden');
-    elements.btnSwPause.textContent = 'Pause';
-    elements.btnSwPause.className = 'px-8 py-4 rounded-lg bg-yellow-600 text-white font-bold text-lg min-h-[44px] min-w-[100px] transition-all hover:bg-yellow-500 active:scale-95 hidden';
+    elements.btnSwPause.textContent = 'PAUSE';
+    elements.btnSwPause.className = 'h-16 px-12 rounded-full bg-yellow-600 text-white font-black text-lg font-display tracking-wide transition-all hover:bg-yellow-500 active:scale-95 shadow-xl hidden';
     elements.btnSwLap.classList.add('hidden');
     elements.lapContainer.classList.add('hidden');
     elements.lapList.innerHTML = '';
@@ -469,16 +490,16 @@
     currentMode = 'timer';
     elements.timerMode.classList.remove('hidden');
     elements.stopwatchMode.classList.add('hidden');
-    elements.tabTimer.className = 'px-6 py-3 rounded-lg bg-blue-600 text-white font-semibold min-h-[44px] transition-all hover:bg-blue-500';
-    elements.tabStopwatch.className = 'px-6 py-3 rounded-lg bg-gray-700 text-gray-300 font-semibold min-h-[44px] transition-all hover:bg-gray-600';
+    elements.tabTimer.className = 'px-8 py-2.5 rounded-full bg-app-primary text-background-dark text-sm font-bold font-display transition-all shadow-lg shadow-app-primary';
+    elements.tabStopwatch.className = 'px-8 py-2.5 rounded-full text-slate-400 text-sm font-bold font-display transition-all hover:text-white';
   }
 
   function switchToStopwatch() {
     currentMode = 'stopwatch';
     elements.timerMode.classList.add('hidden');
     elements.stopwatchMode.classList.remove('hidden');
-    elements.tabTimer.className = 'px-6 py-3 rounded-lg bg-gray-700 text-gray-300 font-semibold min-h-[44px] transition-all hover:bg-gray-600';
-    elements.tabStopwatch.className = 'px-6 py-3 rounded-lg bg-blue-600 text-white font-semibold min-h-[44px] transition-all hover:bg-blue-500';
+    elements.tabTimer.className = 'px-8 py-2.5 rounded-full text-slate-400 text-sm font-bold font-display transition-all hover:text-white';
+    elements.tabStopwatch.className = 'px-8 py-2.5 rounded-full bg-app-primary text-background-dark text-sm font-bold font-display transition-all shadow-lg shadow-app-primary';
   }
 
   // ============================================

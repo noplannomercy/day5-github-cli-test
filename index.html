@@ -1,12 +1,116 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Timer & Stopwatch</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <title>FocusFlow - Timer & Stopwatch</title>
+
+  <!-- Google Fonts: Inter & JetBrains Mono from DESIGN.md -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+
+  <!-- Material Symbols Outlined -->
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            'display': ['Inter', 'sans-serif'],
+            'mono': ['JetBrains Mono', 'monospace']
+          },
+          borderRadius: {
+            'DEFAULT': '1rem',
+            'lg': '2rem',
+            'xl': '3rem',
+            'full': '9999px'
+          }
+        }
+      }
+    }
+  </script>
   <style>
+    /* Color System from DESIGN.md */
+    :root {
+      --color-primary: #2bd4c0;
+      --color-background-dark: #12201e;
+      --color-primary-glow: rgba(43, 212, 192, 0.2);
+    }
+
     .font-mono-nums { font-variant-numeric: tabular-nums; }
+
+    /* Global transition */
+    * {
+      transition-duration: 300ms;
+    }
+
+    /* Remove transitions from inputs and specific elements */
+    input, select, textarea {
+      transition-duration: 150ms;
+    }
+
+    /* Material Symbols */
+    .material-symbols-outlined {
+      font-family: 'Material Symbols Outlined';
+      font-weight: normal;
+      font-style: normal;
+      font-size: 24px;
+      line-height: 1;
+      letter-spacing: normal;
+      text-transform: none;
+      display: inline-block;
+      white-space: nowrap;
+      word-wrap: normal;
+      direction: ltr;
+    }
+
+    /* Scrollbar Styling */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #2a3735;
+      border-radius: 10px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    /* Custom color classes */
+    .bg-app-dark { background-color: var(--color-background-dark); }
+    .bg-app-primary { background-color: var(--color-primary); }
+    .bg-app-primary\/5 { background-color: rgba(43, 212, 192, 0.05); }
+    .bg-app-primary\/10 { background-color: rgba(43, 212, 192, 0.1); }
+    .bg-app-primary\/20 { background-color: rgba(43, 212, 192, 0.2); }
+    .bg-app-primary\/30 { background-color: rgba(43, 212, 192, 0.3); }
+    .text-app-primary { color: var(--color-primary); }
+    .text-background-dark { color: var(--color-background-dark); }
+    .border-app-primary { border-color: var(--color-primary); }
+    .border-app-primary\/30 { border-color: rgba(43, 212, 192, 0.3); }
+    .ring-app-primary { --tw-ring-color: var(--color-primary); }
+    .focus\:border-app-primary:focus { border-color: var(--color-primary); }
+    .hover\:bg-app-primary:hover { background-color: var(--color-primary); }
+    .hover\:bg-app-primary\/10:hover { background-color: rgba(43, 212, 192, 0.1); }
+    .hover\:bg-app-primary\/30:hover { background-color: rgba(43, 212, 192, 0.3); }
+    .shadow-app-primary {
+      box-shadow: 0 4px 14px 0 var(--color-primary-glow),
+                  0 0 20px 0 rgba(43, 212, 192, 0.1);
+    }
+    .shadow-xl { box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3); }
+
+    /* Progress Ring Glow */
+    .progress-ring-glow {
+      filter: drop-shadow(0 0 8px rgba(43, 212, 192, 0.4));
+    }
+
+    /* Background gradient for depth */
+    .bg-background-dark\/50 {
+      background-color: rgba(18, 32, 30, 0.5);
+    }
 
     /* Completion pulse animation */
     @keyframes pulse-complete {
@@ -19,7 +123,7 @@
 
     /* Flash effect */
     @keyframes flash {
-      0%, 50%, 100% { background-color: rgb(17, 24, 39); }
+      0%, 50%, 100% { background-color: var(--color-background-dark); }
       25%, 75% { background-color: rgb(239, 68, 68); }
     }
     .animate-flash {
@@ -27,151 +131,193 @@
     }
   </style>
 </head>
-<body class="bg-gray-900 text-white min-h-screen flex flex-col">
+<body class="bg-app-dark text-white min-h-screen flex flex-col font-display relative overflow-x-hidden">
+  <!-- Decorative Backgrounds -->
+  <div class="absolute top-0 left-1/4 w-96 h-96 bg-app-primary/10 rounded-full blur-[120px] pointer-events-none"></div>
+  <div class="absolute bottom-0 right-1/4 w-96 h-96 bg-app-primary/5 rounded-full blur-[120px] pointer-events-none"></div>
+
   <!-- Header -->
-  <header class="p-4 flex justify-between items-center">
-    <div class="w-10"></div>
-    <h1 class="text-2xl font-bold">Timer & Stopwatch</h1>
-    <button id="btn-fullscreen" class="w-10 h-10 rounded-lg bg-gray-800 hover:bg-gray-700 flex items-center justify-center transition-all" title="Fullscreen (F)">
-      <svg id="icon-expand" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/>
-      </svg>
-      <svg id="icon-compress" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 9V4H4m0 0l5 5m6-5h5v5m0 0l-5-5M9 15v5H4m0 0l5-5m6 5h5v-5m0 0l-5 5"/>
-      </svg>
-    </button>
+  <header class="px-10 py-6 flex justify-between items-center bg-background-dark/50 backdrop-blur-md border-b border-white/5 relative z-10">
+    <div class="flex items-center gap-3">
+      <div class="size-8 bg-app-primary rounded-lg flex items-center justify-center text-background-dark">
+        <span class="material-symbols-outlined font-bold text-xl">hourglass_empty</span>
+      </div>
+      <h2 class="text-xl font-bold leading-tight tracking-tight font-display">FocusFlow</h2>
+    </div>
+    <div class="flex items-center gap-2">
+      <button class="size-10 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition-all active:scale-95" title="Settings">
+        <span class="material-symbols-outlined text-xl">settings</span>
+      </button>
+      <button class="size-10 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition-all active:scale-95" title="Account">
+        <span class="material-symbols-outlined text-xl">account_circle</span>
+      </button>
+      <button id="btn-fullscreen" class="size-10 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition-all active:scale-95" title="Fullscreen (F)">
+        <svg id="icon-expand" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/>
+        </svg>
+        <svg id="icon-compress" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 9V4H4m0 0l5 5m6-5h5v5m0 0l-5-5M9 15v5H4m0 0l5-5m6 5h5v-5m0 0l-5 5"/>
+        </svg>
+      </button>
+    </div>
   </header>
 
   <!-- Mode Tabs -->
-  <nav class="flex justify-center gap-2 p-4">
-    <button id="tab-timer" class="px-6 py-3 rounded-lg bg-blue-600 text-white font-semibold min-h-[44px] transition-all hover:bg-blue-500">
-      Timer
-    </button>
-    <button id="tab-stopwatch" class="px-6 py-3 rounded-lg bg-gray-700 text-gray-300 font-semibold min-h-[44px] transition-all hover:bg-gray-600">
-      Stopwatch
-    </button>
+  <nav class="flex justify-center p-4 mb-12">
+    <div class="flex bg-white/5 p-1.5 rounded-full border border-white/10">
+      <button id="tab-timer" class="px-8 py-2.5 rounded-full bg-app-primary text-background-dark text-sm font-bold font-display transition-all shadow-lg shadow-app-primary">
+        Timer
+      </button>
+      <button id="tab-stopwatch" class="px-8 py-2.5 rounded-full text-slate-400 text-sm font-bold font-display transition-all hover:text-white">
+        Stopwatch
+      </button>
+    </div>
   </nav>
 
-  <main class="flex-1 flex flex-col items-center justify-center p-4">
+  <main class="flex-1 flex flex-col items-center justify-center p-4 relative z-0">
     <!-- Timer Mode -->
     <section id="timer-mode" class="w-full max-w-md flex flex-col items-center gap-6">
       <!-- Time Input -->
-      <div id="timer-input" class="flex items-center gap-2 text-4xl font-mono-nums">
+      <div id="timer-input" class="flex items-center gap-2 text-4xl font-mono font-medium">
         <input type="number" id="input-hours" min="0" max="99" value="0"
-          class="w-20 bg-gray-800 text-center rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
-        <span>:</span>
+          class="w-20 bg-white/5 border border-white/10 text-center rounded-2xl p-3 focus:outline-none focus:ring-2 ring-app-primary focus:border-app-primary font-mono transition-all">
+        <span class="text-white/20">:</span>
         <input type="number" id="input-minutes" min="0" max="59" value="25"
-          class="w-20 bg-gray-800 text-center rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
-        <span>:</span>
+          class="w-20 bg-white/5 border border-white/10 text-center rounded-2xl p-3 focus:outline-none focus:ring-2 ring-app-primary focus:border-app-primary font-mono transition-all">
+        <span class="text-white/20">:</span>
         <input type="number" id="input-seconds" min="0" max="59" value="0"
-          class="w-20 bg-gray-800 text-center rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+          class="w-20 bg-white/5 border border-white/10 text-center rounded-2xl p-3 focus:outline-none focus:ring-2 ring-app-primary focus:border-app-primary font-mono transition-all">
       </div>
 
-      <!-- Large Display -->
-      <div id="timer-display" class="text-8xl font-bold font-mono-nums tracking-wider hidden">
-        25:00
+      <!-- Large Display with Progress Ring -->
+      <div id="timer-display-container" class="relative flex flex-col items-center justify-center hidden">
+        <!-- Circular Progress Ring (SVG) -->
+        <div class="relative size-80 md:size-96 flex items-center justify-center">
+          <svg class="absolute inset-0 size-full -rotate-90 transform" viewBox="0 0 100 100">
+            <!-- Background Circle -->
+            <circle class="text-white/5" cx="50" cy="50" fill="transparent" r="45" stroke="currentColor" stroke-width="2"></circle>
+            <!-- Progress Circle -->
+            <circle id="progress-ring" class="text-app-primary progress-ring-glow" cx="50" cy="50" fill="transparent" r="45" stroke="currentColor" stroke-dasharray="282.7" stroke-dashoffset="0" stroke-linecap="round" stroke-width="3" style="transition: stroke-dashoffset 0.3s ease;"></circle>
+          </svg>
+          <!-- Timer Display (centered inside ring) -->
+          <div class="text-center z-10">
+            <div id="timer-display" class="font-mono text-6xl md:text-7xl font-medium tracking-tighter">25:00</div>
+            <p class="text-slate-400 mt-2 font-display uppercase tracking-[0.2em] text-xs font-semibold">Focus Session</p>
+          </div>
+        </div>
       </div>
 
       <!-- Progress Bar -->
-      <div id="progress-container" class="w-full h-2 bg-gray-700 rounded-full overflow-hidden hidden">
-        <div id="progress-bar" class="h-full bg-green-500 transition-all duration-200" style="width: 100%"></div>
+      <div id="progress-container" class="w-full h-1.5 bg-white/5 rounded-full overflow-hidden hidden">
+        <div id="progress-bar" class="h-full bg-app-primary transition-all duration-1000 shadow-app-primary" style="width: 100%"></div>
       </div>
 
       <!-- Controls -->
-      <div class="flex gap-4">
-        <button id="btn-start" class="px-8 py-4 rounded-lg bg-green-600 text-white font-bold text-lg min-h-[44px] min-w-[100px] transition-all hover:bg-green-500 active:scale-95">
-          Start
+      <div class="flex items-center gap-6">
+        <button id="btn-reset" class="size-14 flex items-center justify-center rounded-full border border-white/10 bg-white/5 text-white hover:bg-white/10 transition-all active:scale-95" title="Reset (R)">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+          </svg>
         </button>
-        <button id="btn-pause" class="px-8 py-4 rounded-lg bg-yellow-600 text-white font-bold text-lg min-h-[44px] min-w-[100px] transition-all hover:bg-yellow-500 active:scale-95 hidden">
-          Pause
+        <button id="btn-start" class="h-16 px-12 rounded-full bg-app-primary text-background-dark font-black text-lg font-display tracking-wide transition-all hover:brightness-110 active:scale-95 shadow-xl shadow-app-primary">
+          START
         </button>
-        <button id="btn-reset" class="px-8 py-4 rounded-lg bg-gray-600 text-white font-bold text-lg min-h-[44px] min-w-[100px] transition-all hover:bg-gray-500 active:scale-95">
-          Reset
+        <button id="btn-pause" class="h-16 px-12 rounded-full bg-yellow-600 text-white font-black text-lg font-display tracking-wide transition-all hover:bg-yellow-500 active:scale-95 shadow-xl hidden">
+          PAUSE
         </button>
       </div>
 
       <!-- Quick Presets -->
-      <div class="flex flex-wrap justify-center gap-2 mt-4">
-        <button data-preset="300" class="preset-btn px-4 py-2 rounded-lg bg-gray-700 hover:bg-gray-600 min-h-[44px] transition-all active:scale-95">5 min</button>
-        <button data-preset="600" class="preset-btn px-4 py-2 rounded-lg bg-gray-700 hover:bg-gray-600 min-h-[44px] transition-all active:scale-95">10 min</button>
-        <button data-preset="900" class="preset-btn px-4 py-2 rounded-lg bg-gray-700 hover:bg-gray-600 min-h-[44px] transition-all active:scale-95">15 min</button>
-        <button data-preset="1500" class="preset-btn px-4 py-2 rounded-lg bg-blue-700 hover:bg-blue-600 min-h-[44px] transition-all active:scale-95">25 min</button>
-        <button data-preset="2700" class="preset-btn px-4 py-2 rounded-lg bg-gray-700 hover:bg-gray-600 min-h-[44px] transition-all active:scale-95">45 min</button>
+      <div class="flex flex-wrap justify-center gap-3">
+        <button data-preset="300" class="preset-btn px-6 py-2 rounded-full border border-app-primary/30 text-app-primary text-sm font-bold font-display hover:bg-app-primary/10 transition-all active:scale-95">5 min</button>
+        <button data-preset="600" class="preset-btn px-6 py-2 rounded-full border border-app-primary/30 text-app-primary text-sm font-bold font-display hover:bg-app-primary/10 transition-all active:scale-95">10 min</button>
+        <button data-preset="900" class="preset-btn px-6 py-2 rounded-full border border-app-primary/30 text-app-primary text-sm font-bold font-display hover:bg-app-primary/10 transition-all active:scale-95">15 min</button>
+        <button data-preset="1500" class="preset-btn px-6 py-2 rounded-full bg-app-primary/5 border border-app-primary hover:bg-app-primary/10 text-app-primary text-sm font-bold font-display transition-all active:scale-95">25 min</button>
+        <button data-preset="2700" class="preset-btn px-6 py-2 rounded-full border border-app-primary/30 text-app-primary text-sm font-bold font-display hover:bg-app-primary/10 transition-all active:scale-95">45 min</button>
       </div>
     </section>
 
     <!-- Stopwatch Mode (hidden by default) -->
     <section id="stopwatch-mode" class="w-full max-w-md flex flex-col items-center gap-6 hidden">
       <!-- Large Display with milliseconds -->
-      <div id="stopwatch-display" class="text-7xl font-bold font-mono-nums tracking-wider">
-        00:00<span class="text-4xl text-gray-400">.00</span>
+      <div class="text-center">
+        <div id="stopwatch-display" class="font-mono text-7xl md:text-8xl font-medium tracking-tighter">
+          00:00<span class="text-4xl text-slate-400">.00</span>
+        </div>
+        <p class="text-slate-400 mt-2 font-display uppercase tracking-[0.2em] text-xs font-semibold">Elapsed Time</p>
       </div>
 
       <!-- Controls -->
-      <div class="flex gap-4">
-        <button id="btn-sw-start" class="px-8 py-4 rounded-lg bg-green-600 text-white font-bold text-lg min-h-[44px] min-w-[100px] transition-all hover:bg-green-500 active:scale-95">
-          Start
+      <div class="flex items-center gap-6">
+        <button id="btn-sw-reset" class="size-14 flex items-center justify-center rounded-full border border-white/10 bg-white/5 text-white hover:bg-white/10 transition-all active:scale-95" title="Reset (R)">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+          </svg>
         </button>
-        <button id="btn-sw-pause" class="px-8 py-4 rounded-lg bg-yellow-600 text-white font-bold text-lg min-h-[44px] min-w-[100px] transition-all hover:bg-yellow-500 active:scale-95 hidden">
-          Pause
+        <button id="btn-sw-start" class="h-16 px-12 rounded-full bg-app-primary text-background-dark font-black text-lg font-display tracking-wide transition-all hover:brightness-110 active:scale-95 shadow-xl shadow-app-primary">
+          START
         </button>
-        <button id="btn-sw-lap" class="px-8 py-4 rounded-lg bg-blue-600 text-white font-bold text-lg min-h-[44px] min-w-[100px] transition-all hover:bg-blue-500 active:scale-95 hidden">
-          Lap
+        <button id="btn-sw-pause" class="h-16 px-12 rounded-full bg-yellow-600 text-white font-black text-lg font-display tracking-wide transition-all hover:bg-yellow-500 active:scale-95 shadow-xl hidden">
+          PAUSE
         </button>
-        <button id="btn-sw-reset" class="px-8 py-4 rounded-lg bg-gray-600 text-white font-bold text-lg min-h-[44px] min-w-[100px] transition-all hover:bg-gray-500 active:scale-95">
-          Reset
+        <button id="btn-sw-lap" class="size-14 flex items-center justify-center rounded-full border border-app-primary bg-app-primary/20 text-app-primary hover:bg-app-primary/30 transition-all active:scale-95 hidden" title="Lap (L)">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+          </svg>
         </button>
       </div>
 
       <!-- Lap Times -->
       <div id="lap-container" class="w-full hidden">
-        <div class="flex justify-between items-center mb-2">
-          <span class="text-gray-400 text-sm">Lap Times</span>
-          <button id="btn-sw-export" class="px-3 py-1 rounded bg-gray-700 hover:bg-gray-600 text-sm min-h-[36px] transition-all active:scale-95">
-            Export
-          </button>
+        <div class="bg-white/5 border border-white/10 rounded-2xl backdrop-blur-sm p-6">
+          <div class="flex justify-between items-center mb-4">
+            <span class="text-white text-sm font-semibold font-display">Lap Times</span>
+            <button id="btn-sw-export" class="px-4 py-2 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 text-xs font-bold font-display transition-all active:scale-95">
+              Export
+            </button>
+          </div>
+          <div id="lap-list" class="space-y-2 max-h-40 overflow-y-auto font-mono"></div>
         </div>
-        <div id="lap-list" class="space-y-2 max-h-40 overflow-y-auto"></div>
       </div>
     </section>
   </main>
 
   <!-- Help Panel -->
-  <div id="help-panel" class="fixed inset-0 bg-black/70 flex items-center justify-center hidden z-50">
-    <div class="bg-gray-800 rounded-xl p-6 max-w-md w-full mx-4 shadow-2xl">
-      <h2 class="text-xl font-bold mb-4 text-center">Keyboard Shortcuts</h2>
+  <div id="help-panel" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center hidden z-50">
+    <div class="bg-white/10 backdrop-blur-md rounded-2xl p-6 max-w-md w-full mx-4 shadow-2xl border border-white/20">
+      <h2 class="text-xl font-bold font-display mb-4 text-center">Keyboard Shortcuts</h2>
 
-      <div class="space-y-4 text-sm">
+      <div class="space-y-4 text-sm font-display">
         <div>
-          <h3 class="font-semibold text-blue-400 mb-2">Global</h3>
-          <div class="grid grid-cols-2 gap-1 text-gray-300">
-            <span><kbd class="bg-gray-700 px-2 py-1 rounded">Space</kbd> Start/Pause</span>
-            <span><kbd class="bg-gray-700 px-2 py-1 rounded">R</kbd> Reset</span>
-            <span><kbd class="bg-gray-700 px-2 py-1 rounded">Esc</kbd> Stop & Reset</span>
-            <span><kbd class="bg-gray-700 px-2 py-1 rounded">F</kbd> Fullscreen</span>
-            <span><kbd class="bg-gray-700 px-2 py-1 rounded">M</kbd> Switch Mode</span>
-            <span><kbd class="bg-gray-700 px-2 py-1 rounded">?</kbd> Help</span>
+          <h3 class="font-semibold text-app-primary mb-2">Global</h3>
+          <div class="grid grid-cols-2 gap-1 text-slate-300">
+            <span><kbd class="bg-white/10 px-2 py-1 rounded font-mono">Space</kbd> Start/Pause</span>
+            <span><kbd class="bg-white/10 px-2 py-1 rounded font-mono">R</kbd> Reset</span>
+            <span><kbd class="bg-white/10 px-2 py-1 rounded font-mono">Esc</kbd> Stop & Reset</span>
+            <span><kbd class="bg-white/10 px-2 py-1 rounded font-mono">F</kbd> Fullscreen</span>
+            <span><kbd class="bg-white/10 px-2 py-1 rounded font-mono">M</kbd> Switch Mode</span>
+            <span><kbd class="bg-white/10 px-2 py-1 rounded font-mono">?</kbd> Help</span>
           </div>
         </div>
 
         <div>
-          <h3 class="font-semibold text-green-400 mb-2">Timer</h3>
-          <div class="grid grid-cols-2 gap-1 text-gray-300">
-            <span><kbd class="bg-gray-700 px-2 py-1 rounded">1-5</kbd> Presets</span>
-            <span><kbd class="bg-gray-700 px-2 py-1 rounded">+/-</kbd> ±1 minute</span>
+          <h3 class="font-semibold text-app-primary mb-2">Timer</h3>
+          <div class="grid grid-cols-2 gap-1 text-slate-300">
+            <span><kbd class="bg-white/10 px-2 py-1 rounded font-mono">1-5</kbd> Presets</span>
+            <span><kbd class="bg-white/10 px-2 py-1 rounded font-mono">+/-</kbd> ±1 minute</span>
           </div>
         </div>
 
         <div>
-          <h3 class="font-semibold text-yellow-400 mb-2">Stopwatch</h3>
-          <div class="grid grid-cols-2 gap-1 text-gray-300">
-            <span><kbd class="bg-gray-700 px-2 py-1 rounded">L</kbd> Lap</span>
-            <span><kbd class="bg-gray-700 px-2 py-1 rounded">E</kbd> Export</span>
+          <h3 class="font-semibold text-app-primary mb-2">Stopwatch</h3>
+          <div class="grid grid-cols-2 gap-1 text-slate-300">
+            <span><kbd class="bg-white/10 px-2 py-1 rounded font-mono">L</kbd> Lap</span>
+            <span><kbd class="bg-white/10 px-2 py-1 rounded font-mono">E</kbd> Export</span>
           </div>
         </div>
       </div>
 
-      <p class="text-gray-500 text-xs text-center mt-4">Press <kbd class="bg-gray-700 px-1 rounded">?</kbd> or click outside to close</p>
+      <p class="text-slate-500 text-xs text-center mt-4 font-display">Press <kbd class="bg-white/10 px-1 rounded font-mono">?</kbd> or click outside to close</p>
     </div>
   </div>
 
