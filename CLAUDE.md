@@ -1,64 +1,53 @@
-# Timer & Stopwatch - CLAUDE.md
+# day5-github-cli
 
-## Tech Stack
-- HTML5, Tailwind CSS (CDN), Vanilla JS (ES6+)
-- Web Audio API, Notification API, LocalStorage
-- Modules: app.js, timer.js, stopwatch.js, audio.js, storage.js
+## 개요
 
-## Commands
-- Open: `start index.html`
-- Test: Browser console + manual timing tests
+GitHub CLI(`gh`)로 GitHub 작업을 수행하고 MCP 없이도 충분한지 검증하는 프로젝트.
+`@playwright/test`로 테스트 구조를 유지하면서 `gh` CLI 명령어 실행 결과를 검증.
 
-## Development Workflow
-CRITICAL: Phase-based workflow:
-1. Complete each phase fully
-2. Test in browser
-3. Commit if tests pass
-4. Update IMPLEMENTATION.md
-5. Continue to next phase
+## 스택
 
-DO NOT skip testing. DO NOT commit failing code.
+- `gh` CLI — GitHub 작업 수행 (PR, 이슈, 코멘트 등)
+- `@playwright/test` — 테스트 실행 프레임워크 (Node.js 기반 CLI 테스트)
 
-## Git Workflow
-Branches: `feature/[name]`, `fix/[name]`
-Commits: `feat:`, `fix:`, `test:`, `docs:`
+## 명령어
 
-Before ANY commit YOU MUST:
-- Test timer accuracy (60 seconds = exactly 60s)
-- Test keyboard shortcuts work
-- Test tab switching maintains time
-- No console errors
+```bash
+npm install                   # 의존성 설치
+npm test                      # 테스트 실행
+npx playwright test --ui      # UI 모드
+npx playwright show-report    # 리포트 보기
+```
 
-## Testing Requirements
-IMPORTANT: Tests FIRST approach
+## 사전 조건
 
-Test coverage:
-- Timer accuracy (no drift over 1 hour)
-- requestAnimationFrame usage (NOT setInterval)
-- Tab visibility handling
-- Keyboard: Space, R, Esc, F, L, +/-
-- Alarm triggers at 0:00
-- Desktop notifications with permission
-- LocalStorage save/load state
-- Stopwatch millisecond precision
+```bash
+gh auth status    # 로그인 상태 확인
+gh auth login     # 미로그인 시
+```
 
-## Code Conventions
-- Use requestAnimationFrame for all timing
-- Track actual elapsed time via Date.now()/performance.now()
-- Cancel rAF on pause/stop
-- Large readable display (min 44px touch targets)
-- Dark mode default
+## 테스트 구조
 
-## Critical Rules
-ALWAYS:
-- Calculate time from timestamps (not ticks)
-- Clean up requestAnimationFrame
-- Handle tab visibility changes
-- Request notification permission before use
+`@playwright/test`를 웹 E2E가 아닌 CLI 명령어 검증 용도로 활용.
+`execSync` 또는 `child_process`로 `gh` 명령어 실행 후 결과 assert.
 
-NEVER:
-- Use setInterval for timing (causes drift)
-- Trust tick counts
-- Block main thread
-- Auto-play alarm without user action
-- Skip rAF cleanup
+```js
+import { test, expect } from '@playwright/test';
+import { execSync } from 'child_process';
+
+test('gh로 PR 목록 조회', () => {
+  const result = execSync('gh pr list --json number,title --limit 5').toString();
+  const prs = JSON.parse(result);
+  expect(Array.isArray(prs)).toBe(true);
+});
+```
+
+## 테스트 파일 위치
+
+`tests/*.spec.js`
+
+## 개발 원칙
+
+- 각 테스트는 독립적으로 실행 가능해야 함
+- `gh` 명령어 실행 결과는 JSON 파싱으로 검증
+- 실제 GitHub 데이터를 사용하므로 네트워크 의존성 있음

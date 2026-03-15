@@ -6,6 +6,10 @@
       "env": {
         "GOOGLE_CLOUD_PROJECT": "stitch-mcp-485600"
       }
+    },
+    "deploy_pipeline": {
+      "command": "python",
+      "args": ["C:\\workspace\\prj20060203\\day5-github-cli\\server.py"]
     }
   }
 }
